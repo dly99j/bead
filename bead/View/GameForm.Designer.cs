@@ -105,11 +105,12 @@
             this.Controls.Add(this.FoodEaten);
             this.Controls.Add(this.Pause);
             this.Controls.Add(this.NewGame);
+            this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "GameForm";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.GameForm_Load);
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.GameForm_KeyPress);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDown_click);
             this.ResumeLayout(false);
             this.PerformLayout();
 

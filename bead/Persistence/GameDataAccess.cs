@@ -29,9 +29,9 @@ namespace bead.Persistence
                     return table;
                 }
             }
-            catch (Exception e)
+            catch
             {
-                throw e;
+                throw new GameDataException();
             }
         }
 

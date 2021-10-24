@@ -69,22 +69,22 @@ namespace bead.Model
             switch (dir)
             {
                 case GameDirection.Up:
-                    if (posY + 1 <= GameTable.Y ||
+                    if (posY + 1 < GameTable.Y &&
                         GameTable.Table[posX, posY + 1] != 'T')
                         return true;
                     break;
                 case GameDirection.Right:
-                    if (posX + 1 <= GameTable.X ||
+                    if (posX + 1 < GameTable.X &&
                         GameTable.Table[posX + 1, posY] != 'T')
                         return true;
                     break;
                 case GameDirection.Down:
-                    if (posY - 1 >= 0 ||
+                    if (posY - 1 >= 0 &&
                         GameTable.Table[posX, posY - 1] != 'T')
                         return true;
                     break;
                 case GameDirection.Left:
-                    if (posX - 1 >= 0 ||
+                    if (posX - 1 >= 0 &&
                         GameTable.Table[posX - 1, posY] != 'T')
                         return true;
                     break;

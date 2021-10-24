@@ -135,20 +135,20 @@ namespace bead
             SetupNewGame();
         }
 
-        private void GameForm_KeyPress(object sender, KeyPressEventArgs e)
+        private void KeyDown_click(object sender, KeyEventArgs e)
         {
-            switch (e.KeyChar)
+            switch (e.KeyCode)
             {
-                case 'w':
+                case Keys.W:
                     mGameModel.PlayerStep(GameDirection.Up);
                     break;
-                case 'a':
+                case Keys.A:
                     mGameModel.PlayerStep(GameDirection.Left);
                     break;
-                case 's':
+                case Keys.S:
                     mGameModel.PlayerStep(GameDirection.Down);
                     break;
-                case 'd':
+                case Keys.D:
                     mGameModel.PlayerStep(GameDirection.Right);
                     break;
             }
