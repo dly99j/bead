@@ -1,143 +1,138 @@
 ﻿using System;
-using bead.Persistence;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using bead.Persistence;
 
 namespace bead.Model
 {
     public class GameModel
     {
-        #region data
-
-        private IGameDataAccess mDataAccess;
-        private GameTable mTable;
-        private Int32 mGameTime;
-        private Int32 mFoodCount;
-
-
-        #endregion
-
         #region constructors
 
         public GameModel(IGameDataAccess dataAccess)
         {
             mDataAccess = dataAccess;
-            mTable = new GameTable();
-            mGameTime = 0;
-            mFoodCount = 5;
+            GameTable = new GameTable();
+            Time = 0;
+            FoodCount = 5;
         }
+
+        #endregion
+
+        #region data
+
+        private readonly IGameDataAccess mDataAccess;
 
         #endregion
 
         #region properties
 
-        public Int32 FoodCount { get { return mFoodCount; } }
-        public Int32 GameTime { get { return mGameTime; } }
-        public GameTable Table { get { return mTable; } }
-        public Boolean IsGameOver { get { return (mTable.GameEnded); } }
+        public int FoodCount { get; private set; }
+
+        public int Time { get; private set; }
+
+        public GameTable GameTable { get; private set; }
+
+        public bool IsGameOver => GameTable.Ended;
 
         #endregion
 
         #region private methods
 
-        private Direction oppositeDir(Direction dir)
+        private GameDirection OppositeDir(GameDirection dir)
         {
             switch (dir)
             {
-                case Direction.Up:
-                    return Direction.Down;
-                case Direction.Right:
-                    return Direction.Left;
-                case Direction.Down:
-                    return Direction.Up;
-                case Direction.Left:
-                    return Direction.Right;
+                case GameDirection.Up:
+                    return GameDirection.Down;
+                case GameDirection.Right:
+                    return GameDirection.Left;
+                case GameDirection.Down:
+                    return GameDirection.Up;
+                case GameDirection.Left:
+                    return GameDirection.Right;
             }
+
             throw new Exception("did I add an extra to the enum? or idk, check this. i just want to stop the " +
                                 "compiler from giving me an error that this might not return");
         }
 
-        private Boolean canMove(GameObject movable, Direction dir)
+        private bool CanMove(GameObject movable, GameDirection dir)
         {
             var posX = movable.Position.Item1;
             var posY = movable.Position.Item2;
             switch (dir)
             {
-                case Direction.Up:
+                case GameDirection.Up:
                     if (posY - 1 >= 0 ||
-                        mTable.Table[posX, posY - 1] != 'T')
-                    { return true; }
+                        GameTable.Table[posX, posY - 1] != 'T')
+                        return true;
                     break;
-                case Direction.Right:
-                    if (posX + 1 <= mTable.X ||
-                        mTable.Table[posX + 1, posY] != 'T')
-                    { return true; }
+                case GameDirection.Right:
+                    if (posX + 1 <= GameTable.X ||
+                        GameTable.Table[posX + 1, posY] != 'T')
+                        return true;
                     break;
-                case Direction.Down:
-                    if (posY + 1 <= mTable.Y ||
-                        mTable.Table[posX, posY + 1] != 'T')
-                    { return true; }
+                case GameDirection.Down:
+                    if (posY + 1 <= GameTable.Y ||
+                        GameTable.Table[posX, posY + 1] != 'T')
+                        return true;
                     break;
-                case Direction.Left:
+                case GameDirection.Left:
                     if (posX - 1 >= 0 ||
-                        mTable.Table[posX - 1, posY] != 'T')
-                    { return true; }
+                        GameTable.Table[posX - 1, posY] != 'T')
+                        return true;
                     break;
             }
+
             return false;
         }
 
-        private void moveMovable(GameObject movable, Direction dir)
+        private void MoveMovable(GameObject movable, GameDirection dir)
         {
             var posX = movable.Position.Item1;
             var posY = movable.Position.Item2;
-            if (canMove(movable, dir))
-            {
+            if (CanMove(movable, dir))
                 switch (dir)
                 {
-                    case Direction.Up:
-                        movable.Position = new Tuple<Int32, Int32>(posX, posY - 1);
+                    case GameDirection.Up:
+                        movable.Position = new Tuple<int, int>(posX, posY - 1);
                         break;
-                    case Direction.Right:
-                        movable.Position = new Tuple<Int32, Int32>(posX + 1, posY);
+                    case GameDirection.Right:
+                        movable.Position = new Tuple<int, int>(posX + 1, posY);
                         break;
-                    case Direction.Down:
-                        movable.Position = new Tuple<Int32, Int32>(posX, posY + 1);
+                    case GameDirection.Down:
+                        movable.Position = new Tuple<int, int>(posX, posY + 1);
                         break;
-                    case Direction.Left:
-                        movable.Position = new Tuple<Int32, Int32>(posX - 1, posY);
+                    case GameDirection.Left:
+                        movable.Position = new Tuple<int, int>(posX - 1, posY);
                         break;
                 }
-            }
         }
 
-        private void moveGuard(GameGuard g)
+        private void MoveGuard(GameGuard g)
         {
-            if (!canMove(g, g.Direction))
-            {
-                g.Direction = oppositeDir(g.Direction);
-            }
+            if (!CanMove(g, g.Direction))
+                g.Direction = OppositeDir(g.Direction);
             else
-            {
-                moveMovable(g, g.Direction);
-            }
+                MoveMovable(g, g.Direction);
         }
 
-        private Boolean isVisibleForGueards()
+        private bool IsVisibleForGuards()
         {
-            var playerX = mTable.Player.Position.Item1;
-            var playerY = mTable.Player.Position.Item2;
-            foreach (var v in mTable.Guards)
+            var playerX = GameTable.Player.Position.Item1;
+            var playerY = GameTable.Player.Position.Item2;
+            foreach (var v in GameTable.Guards)
             {
                 var guardX = v.Position.Item1;
                 var guardY = v.Position.Item2;
 
                 if (Enumerable.Range(playerX - 1, playerX + 1).Contains(guardX) ||
                     Enumerable.Range(playerY - 1, playerY + 1).Contains(guardY))
-                {
                     return true;
-                }
             }
+
             return false;
         }
 
@@ -145,71 +140,118 @@ namespace bead.Model
 
         #region public methods
 
-
-        public void moveGuards()
+        public async Task MoveGuards()
         {
-            foreach (var g in mTable.Guards)
-            {
-                moveGuard(g);
-            }
+            foreach (var g in GameTable.Guards) MoveGuard(g);
         }
 
-        public void movePlayer(Direction dir)
+        public async Task MovePlayer(GameDirection dir)
         {
-            if (canMove(mTable.Player, dir))
-            {
-                moveMovable(mTable.Player, dir);
-            }
+            if (CanMove(GameTable.Player, dir)) MoveMovable(GameTable.Player, dir);
 
-            foreach (var v in mTable.Foods)
-            {
-                if (v.Position.Equals(mTable.Player.Position))
+            foreach (var v in GameTable.Foods)
+                if (v.Position.Equals(GameTable.Player.Position))
                 {
-                    mTable.Foods.Remove(v);
-                    --mTable.NumOfFood;
+                    GameTable.Foods.Remove(v);
+                    --GameTable.NumOfFood;
                 }
-            }
         }
 
-        public void updateTable()
+        public void UpdateTable()
         {
-            var newTable = new Char[mTable.X, mTable.Y];
+            var newTable = new char[GameTable.X, GameTable.Y];
 
-            for (var i = 0; i < mTable.Y; ++i)
-                for (var j = 0; j < mTable.X; ++j)
-                    newTable[j, i] = 'E';
+            for (var i = 0; i < GameTable.Y; ++i)
+            for (var j = 0; j < GameTable.X; ++j)
+                newTable[j, i] = 'E';
 
-            foreach (var v in mTable.Foods)
+            foreach (var v in GameTable.Foods)
                 newTable[v.Position.Item1, v.Position.Item2] = 'F';
 
-            foreach (var v in mTable.Trees)
+            foreach (var v in GameTable.Trees)
                 newTable[v.Position.Item1, v.Position.Item2] = 'T';
 
-            foreach (var v in mTable.Guards)
+            foreach (var v in GameTable.Guards)
                 newTable[v.Position.Item1, v.Position.Item2] = 'G';
 
-            newTable[mTable.Player.Position.Item1, mTable.Player.Position.Item2] = 'P';
+            newTable[GameTable.Player.Position.Item1, GameTable.Player.Position.Item2] = 'P';
 
-            mTable.Table = newTable;
+            GameTable.Table = newTable;
         }
 
-        public async Task loadGameAsync(String path)
+        public async Task LoadGameAsync(string path)
         {
             if (mDataAccess == null)
                 throw new InvalidOperationException("No data access is provided.");
 
-            mTable = await mDataAccess.LoadAsync(path);
-            mGameTime = 0;
-            mFoodCount = mTable.NumOfFood;
+            GameTable = await mDataAccess.LoadAsync(path);
+            Time = 0;
+            FoodCount = GameTable.NumOfFood;
+        }
+
+        public async void GameStep()
+        {
+            if (IsGameOver)
+                return;
+
+            await MoveGuards();
+            UpdateTable();
+
+            if (IsVisibleForGuards())
+                GameTable.Ended = true;
+        }
+
+        public async void PlayerStep(GameDirection dir)
+        {
+            if (IsGameOver)
+                return;
+
+            await MovePlayer(dir);
+            UpdateTable();
+
+            if (IsVisibleForGuards())
+                GameTable.Ended = true;
+        }
+        public void AdvanceTime()
+        {
+            if (IsGameOver)
+                return;
+
+            ++Time;
+            OnGameAdvanced();
         }
 
         #endregion
 
         #region events
 
-        public event EventHandler<GameEventArgs> GameAdvanced;
+        public event EventHandler<GameEventArgs> Advanced;
 
-        public event EventHandler<GameEventArgs> GameOver;
+        public event EventHandler<GameEventArgs> Over;
+
+        public event EventHandler<GameEventArgs> PlayerMove; 
+
+        #endregion
+
+        #region private event methods
+
+        private void OnGameAdvanced()
+        {
+            if (Advanced != null)
+                Advanced(this, new GameEventArgs(Time, false, FoodCount));
+        }
+
+        private void OnPlayerMove()
+        {
+            if (PlayerMove != null)
+                PlayerMove(this, new GameEventArgs(Time, IsGameOver, FoodCount));
+        }
+
+        private void OnGameOver(Boolean isWon)
+        {
+            if (Over != null)
+                Over(this, new GameEventArgs(Time, isWon, FoodCount));
+        }
 
         #endregion
     }

@@ -4,19 +4,17 @@ namespace bead.Model
 {
     public class GameEventArgs : EventArgs
     {
-        private Int32 mGameTime;
-        private Boolean mIsWon;
-        private Int32 mFoodLeft;
-
-        public Int32 GameTime { get { return mGameTime; } }
-        public Boolean IsWon { get { return mIsWon; } }
-        public Int32 FoodLeft { get { return mFoodLeft; } }
-
-        public GameEventArgs(int GameTime, bool IsWon, int FoodLeft)
+        public GameEventArgs(int time, bool isWon, int foodLeft)
         {
-            mGameTime = GameTime;
-            mIsWon = IsWon;
-            mFoodLeft = FoodLeft;
+            this.Time = time;
+            this.IsWon = isWon;
+            this.FoodLeft = foodLeft;
         }
+
+        public int Time { get; }
+
+        public bool IsWon { get; }
+
+        public int FoodLeft { get; }
     }
 }

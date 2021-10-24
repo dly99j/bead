@@ -1,11 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace bead.Persistence
 {
     public interface IGameDataAccess
     {
-        Task<GameTable> LoadAsync(String path);
-        Task SaveAsync(String path, GameTable table);
+        Task<GameTable> LoadAsync(string path);
+        Task SaveAsync(string path, GameTable table);
     }
 }

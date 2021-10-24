@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace bead.Persistence
 {
     public class GamePlayer : GameObject
     {
-        private Boolean mIsCaught;
-        public Boolean IsCaught { get { return mIsCaught; } }
-
-        public GamePlayer(Int32 X, Int32 Y) 
+        public GamePlayer(int x, int y)
         {
-            mIsCaught = false;
-            mPosition = new Tuple<Int32, Int32>(X, Y);
+            IsCaught = false;
+            mPosition = new Tuple<int, int>(x, y);
         }
+
+        public bool IsCaught { get; }
     }
 }

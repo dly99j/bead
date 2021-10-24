@@ -5,107 +5,87 @@ namespace bead.Persistence
 {
     public class GameTable
     {
-        #region data
-
-        private Int32 mX;
-        private Int32 mY;
-
-        //E = empty field
-        //F = Food
-        //G = Guard
-        //P = Player
-        //T = Tree
-        private Char[,] mTable;
-        private Int32 mNumOfGuards;
-        private Int32 mNumOfFood;
-        private Boolean mGameEnded;
-
-        private GamePlayer mPlayer;
-        private List<GameGuard> mGuards;
-        private List<GameFood> mFoods;
-        private List<GameTree> mTrees;
-
-        #endregion
-
         #region constructors
 
-        public GameTable(Int32 X, Int32 Y)
+        public GameTable(int x, int y)
         {
-            if (X < 1 || Y < 1)
-            {
-                throw new ArgumentOutOfRangeException("invalid table size");
-            }
+            if (x < 1 || y < 1) throw new ArgumentOutOfRangeException("invalid table size");
 
-            mX = X;
-            mY = Y;
-            mTable = new Char[mX, mY];
-            mNumOfGuards = 0;
-            mNumOfFood = 0;
-            mGuards = new List<GameGuard>();
-            mTrees = new List<GameTree>();
-            mFoods = new List<GameFood>();
-            mGameEnded = false;
+            this.X = x;
+            this.Y = y;
+            Table = new char[this.X, this.Y];
+            NumOfGuards = 0;
+            NumOfFood = 0;
+            Guards = new List<GameGuard>();
+            Trees = new List<GameTree>();
+            Foods = new List<GameFood>();
+            Ended = false;
         }
 
-        public GameTable() : this(10, 10) { }
+        public GameTable() : this(10, 10)
+        {
+        }
 
         #endregion
 
         #region methods
 
-        public void setFieldOnInit(Int32 X, Int32 Y, Char val)
+        public void setFieldOnInit(int x, int y, char val)
         {
-            if (X > mX || X < 0 || Y > mY || Y < 0)
-            {
+            if (x > this.X || x < 0 || y > this.Y || y < 0)
                 throw new ArgumentOutOfRangeException("invalid coordinates");
-            }
 
             if (val != 'P' || val != 'G' || val != 'T' || val != 'F' || val != 'E')
-            {
                 throw new ArgumentException("invalid field type");
-            }
 
-            mTable[X, Y] = val;
+            Table[x, y] = val;
 
             if (val == 'G')
             {
-                ++mNumOfGuards;
-                mGuards.Add(new GameGuard(X, Y));
-            } 
+                ++NumOfGuards;
+                Guards.Add(new GameGuard(x, y));
+            }
             else if (val == 'F')
             {
-                ++mNumOfFood;
-                mFoods.Add(new GameFood(X, Y));
-            } 
+                ++NumOfFood;
+                Foods.Add(new GameFood(x, y));
+            }
             else if (val == 'P')
             {
-                mPlayer = new GamePlayer(X, Y);
-            } 
+                Player = new GamePlayer(x, y);
+            }
             else if (val == 'T')
             {
-                mTrees.Add(new GameTree(X, Y));
+                Trees.Add(new GameTree(x, y));
             }
         }
-        public Char getField(Int32 X, Int32 Y)
+
+        public char GetField(int x, int y)
         {
-            return mTable[X, Y];
+            return Table[x, y];
         }
 
         #endregion
 
         #region properties
 
-        public Tuple<Int32, Int32> Size { get { return new Tuple<Int32, Int32>(mX, mY); } }
-        public char[,] Table { get => mTable; set => mTable = value; }
-        public int X { get => mX; set => mX = value; }
-        public int Y { get => mY; set => mY = value; }
-        public GamePlayer Player { get => mPlayer; set => mPlayer = value; }
-        public List<GameFood> Foods { get => mFoods; set => mFoods = value; }
-        public List<GameTree> Trees { get => mTrees; set => mTrees = value; }
-        public List<GameGuard> Guards { get => mGuards; set => mGuards = value; }
-        public int NumOfGuards { get => mNumOfGuards; set => mNumOfGuards = value; }
-        public int NumOfFood { get => mNumOfFood; set => mNumOfFood = value; }
-        public bool GameEnded { get => mGameEnded; set => mGameEnded = value; }
+        public Tuple<int, int> Size => new Tuple<int, int>(X, Y);
+
+        //E = empty field
+        //F = Food
+        //G = Guard
+        //P = Player
+        //T = Tree
+        public char[,] Table { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public GamePlayer Player { get; set; }
+        public List<GameFood> Foods { get; set; }
+        public List<GameTree> Trees { get; set; }
+        public List<GameGuard> Guards { get; set; }
+        public int NumOfGuards { get; set; }
+        public int NumOfFood { get; set; }
+        public bool Ended { get; set; }
 
         #endregion
     }
