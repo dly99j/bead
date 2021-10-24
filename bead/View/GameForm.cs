@@ -16,7 +16,7 @@ namespace bead
     {
         private GameModel mGameModel;
         private GameDataAccess mDataAccess;
-        private Timer mTimer;
+        private Int32 mObjectWidth, mObjectHeight;
         public GameForm()
         {
             InitializeComponent();
@@ -38,19 +38,82 @@ namespace bead
 
         }
 
-        private void Game_GameAdvanced(Object sender, GameEventArgs e)
+        private void Game_GameAdvanced(Object sender, EventArgs e)
         {
-
+            UpdateCanvas();
         }
 
         private void Game_GameOver(Object sender, GameEventArgs e)
         {
+            mTimer.Stop();
 
+            if (e.IsWon)
+            {
+                MessageBox.Show("Congrats. You won", "MaciLaci",MessageBoxButtons.OK);
+            }
+            else
+            {
+                MessageBox.Show("You suck.", "MaciLaci", MessageBoxButtons.OK);
+            }
+        }
+
+        private void DrawObject(GameObject obj, Graphics canvas, Brush colour)
+        {
+            var canvas = e.Graphics;
+            canvas.FillRectangle(colour, new Rectangle
+            (
+                obj.Position.Item1 * mObjectWidth,
+                obj.Position.Item2 * mObjectHeight,
+                mObjectWidth,
+                mObjectHeight
+            ));
+        }
+
+        private void UpdateCanvas(Object sender, PaintEventArgs e)
+        {
+            var canvas = e.Graphics;
+
+            foreach (var v in mGameModel.Table.Foods)
+            {
+                DrawObject(v, canvas, Brushes.Red);
+            }
+
+            foreach (var v in mGameModel.Table.Trees)
+            {
+                DrawObject(v, canvas, Brushes.Brown);
+            }
+
+            foreach (var v in mGameModel.Table.Guards)
+            {
+                DrawObject(v, canvas, Brushes.Blue);
+            }
+
+            DrawObject(mGameModel.Table.Player, canvas, Brushes.Green);
         }
 
         private void Timer_Tick(Object sender, EventArgs e)
         {
             
+        }
+
+        private void MenuFileLoadGame_Click(Object sender, EventArgs e)
+        {
+            
+        }
+
+        private void OnNewGame_click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void OnPause_click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void saveFileDialog1_FileOk(Object sender, CancelEventArgs e)
+        {
+
         }
     }
 }
