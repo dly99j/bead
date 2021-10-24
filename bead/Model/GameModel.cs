@@ -119,8 +119,8 @@ namespace bead.Model
         {
             if (!CanMove(g, g.Direction))
                 g.Direction = OppositeDir(g.Direction);
-            else
-                MoveMovable(g, g.Direction);
+                
+            MoveMovable(g, g.Direction);
         }
 
         private bool IsVisibleForGuards()
@@ -201,8 +201,8 @@ namespace bead.Model
             await MoveGuards();
             UpdateTable();
 
-            if (IsVisibleForGuards())
-                GameTable.Ended = true;
+            //if (IsVisibleForGuards())
+            //    GameTable.Ended = true;
         }
 
         public async void PlayerStep(GameDirection dir)
@@ -213,8 +213,8 @@ namespace bead.Model
             await MovePlayer(dir);
             UpdateTable();
 
-            if (IsVisibleForGuards())
-                GameTable.Ended = true;
+            //if (IsVisibleForGuards())
+            //    GameTable.Ended = true;
         }
         public void AdvanceTime()
         {

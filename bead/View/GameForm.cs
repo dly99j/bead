@@ -140,16 +140,16 @@ namespace bead
             switch (e.KeyCode)
             {
                 case Keys.W:
-                    mGameModel.PlayerStep(GameDirection.Up);
-                    break;
-                case Keys.A:
                     mGameModel.PlayerStep(GameDirection.Left);
                     break;
-                case Keys.S:
+                case Keys.A:
                     mGameModel.PlayerStep(GameDirection.Down);
                     break;
-                case Keys.D:
+                case Keys.S:
                     mGameModel.PlayerStep(GameDirection.Right);
+                    break;
+                case Keys.D:
+                    mGameModel.PlayerStep(GameDirection.Up);
                     break;
             }
         }
