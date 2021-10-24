@@ -36,6 +36,10 @@ namespace bead.Model
 
         public bool IsGameOver => GameTable.Ended;
 
+        public int Width => GameTable.X;
+        public int Height => GameTable.Y;
+        public char[,] CharTableRepresentation => GameTable.Table;
+
         #endregion
 
         #region private methods
@@ -65,8 +69,8 @@ namespace bead.Model
             switch (dir)
             {
                 case GameDirection.Up:
-                    if (posY - 1 >= 0 ||
-                        GameTable.Table[posX, posY - 1] != 'T')
+                    if (posY + 1 <= GameTable.Y ||
+                        GameTable.Table[posX, posY + 1] != 'T')
                         return true;
                     break;
                 case GameDirection.Right:
@@ -75,8 +79,8 @@ namespace bead.Model
                         return true;
                     break;
                 case GameDirection.Down:
-                    if (posY + 1 <= GameTable.Y ||
-                        GameTable.Table[posX, posY + 1] != 'T')
+                    if (posY - 1 >= 0 ||
+                        GameTable.Table[posX, posY - 1] != 'T')
                         return true;
                     break;
                 case GameDirection.Left:
@@ -97,13 +101,13 @@ namespace bead.Model
                 switch (dir)
                 {
                     case GameDirection.Up:
-                        movable.Position = new Tuple<int, int>(posX, posY - 1);
+                        movable.Position = new Tuple<int, int>(posX, posY + 1);
                         break;
                     case GameDirection.Right:
                         movable.Position = new Tuple<int, int>(posX + 1, posY);
                         break;
                     case GameDirection.Down:
-                        movable.Position = new Tuple<int, int>(posX, posY + 1);
+                        movable.Position = new Tuple<int, int>(posX, posY - 1);
                         break;
                     case GameDirection.Left:
                         movable.Position = new Tuple<int, int>(posX - 1, posY);
@@ -162,8 +166,8 @@ namespace bead.Model
             var newTable = new char[GameTable.X, GameTable.Y];
 
             for (var i = 0; i < GameTable.Y; ++i)
-            for (var j = 0; j < GameTable.X; ++j)
-                newTable[j, i] = 'E';
+                for (var j = 0; j < GameTable.X; ++j)
+                    newTable[j, i] = 'E';
 
             foreach (var v in GameTable.Foods)
                 newTable[v.Position.Item1, v.Position.Item2] = 'F';
@@ -219,6 +223,7 @@ namespace bead.Model
 
             ++Time;
             OnGameAdvanced();
+            GameStep();
         }
 
         #endregion

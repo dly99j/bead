@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace bead.Persistence
 {
@@ -20,15 +22,16 @@ namespace bead.Persistence
                     for (var i = 0; i < tableY; ++i)
                     {
                         line = await reader.ReadLineAsync();
-                        for (var j = 0; j < tableX; ++j) table.setFieldOnInit(j, i, line[j]);
+                        for (var j = 0; j < tableX; ++j) 
+                            table.setFieldOnInit(i, j, line[j]);
                     }
 
                     return table;
                 }
             }
-            catch
+            catch (Exception e)
             {
-                throw new GameDataException();
+                throw e;
             }
         }
 

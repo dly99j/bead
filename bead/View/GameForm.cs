@@ -15,7 +15,8 @@ namespace bead
         private GameModel mGameModel;
         private int mObjectWidth, mObjectHeight;
         private DifficultyForm mDifficultyForm;
-        private Boolean mGameStarted = false;
+        private Button[,] mButtonGrid;
+        private Boolean mGameStarted = false, mMapLoaded = false;
         private Difficulty mDifficulty;
 
         public GameForm()
@@ -39,6 +40,7 @@ namespace bead
 
         private void Game_GameAdvanced(object sender, EventArgs e)
         {
+            UpdateFillTable();
         }
 
         private void Game_GameOver(object sender, GameEventArgs e)
@@ -51,37 +53,58 @@ namespace bead
                 MessageBox.Show("You suck.", "MaciLaci", MessageBoxButtons.OK);
         }
 
-        private void DrawObject(GameObject obj, Graphics canvas, Brush colour)
+        private void GenerateTable()
         {
-            canvas.FillRectangle(colour, new Rectangle
-            (
-                obj.Position.Item1 * mObjectWidth,
-                obj.Position.Item2 * mObjectHeight,
-                mObjectWidth,
-                mObjectHeight
-            ));
+            mButtonGrid = new Button[mGameModel.Width, mGameModel.Height];
+
+            for (Int32 i = 0; i < mGameModel.GameTable.X; i++)
+            {
+                for (Int32 j = 0; j < mGameModel.GameTable.Y; j++)
+                {
+                    mButtonGrid[i, j] = new Button();
+                    mButtonGrid[i, j].Location = new Point(5 + 50 * j, 35 + 50 * i);
+                    mButtonGrid[i, j].Size = new Size(50, 50);
+                    mButtonGrid[i, j].Enabled = false; // kikapcsolt állapot
+                    mButtonGrid[i, j].TabIndex = 100 + i * mGameModel.GameTable.X + j;
+                    mButtonGrid[i, j].FlatStyle = FlatStyle.Flat;
+
+                    Controls.Add(mButtonGrid[i, j]);
+                }
+            }
         }
 
-        private void UpdateCanvas(object sender, PaintEventArgs e)
+        private void UpdateFillTable()
         {
-            var canvas = e.Graphics;
-
-            if (mGameStarted)
+            for (Int32 i = 0; i < mGameModel.Width; i++)
             {
-                foreach (var v in mGameModel.GameTable.Foods) DrawObject(v, canvas, Brushes.Red);
-
-                foreach (var v in mGameModel.GameTable.Trees) DrawObject(v, canvas, Brushes.Brown);
-
-                foreach (var v in mGameModel.GameTable.Guards) DrawObject(v, canvas, Brushes.Blue);
-
-                DrawObject(mGameModel.GameTable.Player, canvas, Brushes.Green);
+                for (Int32 j = 0; j < mGameModel.Height; j++)
+                {
+                    switch (mGameModel.CharTableRepresentation[i, j])
+                    {
+                        case 'E':
+                            mButtonGrid[i, j].BackColor = Color.LightGray;
+                            break;
+                        case 'T':
+                            mButtonGrid[i, j].BackColor = Color.Brown;
+                            break;
+                        case 'F':
+                            mButtonGrid[i, j].BackColor = Color.Red;
+                            break;
+                        case 'G':
+                            mButtonGrid[i, j].BackColor = Color.Blue;
+                            break;
+                        case 'P':
+                            mButtonGrid[i, j].BackColor = Color.Green;
+                            break;
+                    }
+                }
             }
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
             mGameModel.AdvanceTime();
-            pictureBox1.Invalidate();
+            UpdateFillTable();
         }
 
         private void MenuFileLoadGame_Click(object sender, EventArgs e)
@@ -91,8 +114,6 @@ namespace bead
         private void OnNewGame_click(object sender, EventArgs e)
         {
             mDifficultyForm.ShowDialog();
-
-            mGameStarted = true;
         }
 
         private void OnPause_click(object sender, EventArgs e)
@@ -102,8 +123,16 @@ namespace bead
         private void SetupNewGame()
         {
             mDifficulty = mDifficultyForm.GameDifficulty;
-
+            mGameStarted = true;
             LoadMapFromFile();
+            GenerateTable();
+            UpdateFillTable();
+            mTimer.Start();
+        }
+
+        private void Start_Click(object sender, EventArgs e)
+        {
+            SetupNewGame();
         }
 
         private void GameForm_KeyPress(object sender, KeyPressEventArgs e)
@@ -111,7 +140,17 @@ namespace bead
             switch (e.KeyChar)
             {
                 case 'w':
-
+                    mGameModel.PlayerStep(GameDirection.Up);
+                    break;
+                case 'a':
+                    mGameModel.PlayerStep(GameDirection.Left);
+                    break;
+                case 's':
+                    mGameModel.PlayerStep(GameDirection.Down);
+                    break;
+                case 'd':
+                    mGameModel.PlayerStep(GameDirection.Right);
+                    break;
             }
         }
 
@@ -122,20 +161,21 @@ namespace bead
                 switch (mDifficulty)
                 {
                     case Difficulty.Easy:
-                        await mGameModel.LoadGameAsync(@"C:\Users\horva\Desktop\bead\bead\table1.txt");
+                        await mGameModel.LoadGameAsync(@"C:\Users\dr. Jenei Tímea\source\repos\bead\bead\table1.txt");
                         break;
                     case Difficulty.Medium:
-                        await mGameModel.LoadGameAsync(@"C:\Users\horva\Desktop\bead\bead\table2.txt");
+                        await mGameModel.LoadGameAsync(@"C:\Users\dr. Jenei Tímea\source\repos\bead\bead\table2.txt");
                         break;
                     case Difficulty.Hard:
-                        await mGameModel.LoadGameAsync(@"C:\Users\horva\Desktop\bead\bead\table3.txt");
+                        await mGameModel.LoadGameAsync(@"C:\Users\dr. Jenei Tímea\source\repos\bead\bead\table3.txt");
                         break;
                 }
             }
-            catch
+            catch (Exception e)
             {
-                MessageBox.Show("error while loading map");
+                MessageBox.Show("error while loading map\n" + e.ToString());
             }
+            mTimer.Start();
         }
     }
 }

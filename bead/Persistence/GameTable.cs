@@ -32,10 +32,10 @@ namespace bead.Persistence
 
         public void setFieldOnInit(int x, int y, char val)
         {
-            if (x > this.X || x < 0 || y > this.Y || y < 0)
+            if (x >= this.X || x < 0 || y >= this.Y || y < 0)
                 throw new ArgumentOutOfRangeException("invalid coordinates");
 
-            if (val != 'P' || val != 'G' || val != 'T' || val != 'F' || val != 'E')
+            if (val != 'P' && val != 'G' && val != 'T' && val != 'F' && val != 'E')
                 throw new ArgumentException("invalid field type");
 
             Table[x, y] = val;
