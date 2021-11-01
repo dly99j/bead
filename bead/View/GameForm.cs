@@ -250,7 +250,7 @@ namespace bead
             if (e.IsWon)
                 MessageBox.Show("Congrats. You won", "MaciLaci", MessageBoxButtons.OK);
             else
-                MessageBox.Show("You suck.", "MaciLaci", MessageBoxButtons.OK);
+                MessageBox.Show("You Lost.", "MaciLaci", MessageBoxButtons.OK);
 
             mReAddTick = true;
         }

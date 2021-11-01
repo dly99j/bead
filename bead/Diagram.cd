@@ -1,119 +1,119 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="bead.Properties.Resources" Collapsed="true">
-    <Position X="16.25" Y="2.5" Width="1.5" />
+  <Class Name="bead.Properties.Resources">
+    <Position X="19.5" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
     </TypeIdentifier>
   </Class>
-  <Class Name="bead.Model.GameEventArgs" Collapsed="true">
-    <Position X="12.75" Y="1.5" Width="1.5" />
+  <Class Name="bead.Model.GameEventArgs">
+    <Position X="9.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAACAAAAAAAAAAAAAAQAAAAAAgAAAAAAAAAAAAAQA=</HashCode>
       <FileName>Model\GameEventArgs.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="bead.Model.GameModel">
-    <Position X="16.25" Y="1.5" Width="3" />
+    <Position X="12" Y="0.5" Width="3" />
     <TypeIdentifier>
       <HashCode>gAAAgCAABABAIAAAESIASEQAAAAAAAACgKgAAEiCAQA=</HashCode>
       <FileName>Model\GameModel.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="bead.Persistence.GameDataAccess" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="14.5" Y="0.5" Width="1.5" />
+  <Class Name="bead.Persistence.GameDataAccess" BaseTypeListCollapsed="true">
+    <Position X="1" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Persistence\GameDataAccess.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="bead.Persistence.GameDataException" Collapsed="true">
-    <Position X="16.25" Y="0.5" Width="1.5" />
+  <Class Name="bead.Persistence.GameDataException">
+    <Position X="1.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Persistence\GameDataException.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="bead.Persistence.GameFood">
-    <Position X="3.5" Y="1.75" Width="1.5" />
+    <Position X="0.5" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Persistence\GameFood.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="bead.Persistence.GameGuard">
-    <Position X="8" Y="1.75" Width="1.5" />
+    <Position X="4" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Persistence\GameGuard.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="bead.Persistence.GameObject">
-    <Position X="6.75" Y="0.5" Width="1.5" />
+    <Position X="3.5" Y="5.25" Width="1.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
       <FileName>Persistence\GameObject.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="bead.Persistence.GamePlayer">
-    <Position X="10.25" Y="1.75" Width="1.5" />
+    <Position X="5.75" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Persistence\GamePlayer.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="bead.Persistence.GameTable" Collapsed="true">
-    <Position X="14.5" Y="2.5" Width="1.5" />
+  <Class Name="bead.Persistence.GameTable">
+    <Position X="5.75" Y="2" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAEAAAgAEEgBEAAACAAAAAAAAACAAAAAEAARIAAAA=</HashCode>
       <FileName>Persistence\GameTable.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="bead.Persistence.GameTree">
-    <Position X="5.75" Y="1.75" Width="1.5" />
+    <Position X="2.25" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Persistence\GameTree.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="bead.View.DifficultyForm" Collapsed="true">
-    <Position X="12.75" Y="0.5" Width="1.5" />
+  <Class Name="bead.View.DifficultyForm">
+    <Position X="14.25" Y="11" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACABAAAAAACAAQACAAAAAAAAAAEAAAAlAAA=</HashCode>
       <FileName>View\DifficultyForm.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="bead.GameForm">
-    <Position X="14.5" Y="1.5" Width="1.5" />
+    <Position X="8.25" Y="9.5" Width="4" />
     <TypeIdentifier>
-      <HashCode>CAAkAqwGECABZAAYEIiqAAECBCAAAAAJBAABAIAAIIA=</HashCode>
+      <HashCode>CAAgA6QGECABZAAKEIiqAAECBCAAAAAJBAABAIAAAIA=</HashCode>
       <FileName>View\GameForm.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="bead.GameProgram">
-    <Position X="12.75" Y="2.5" Width="1.5" />
+    <Position X="4.5" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
       <FileName>Program.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="bead.Persistence.IGameDataAccess" Collapsed="true">
-    <Position X="12.75" Y="3.75" Width="1.5" />
+  <Interface Name="bead.Persistence.IGameDataAccess">
+    <Position X="3" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Persistence\IGameDataAccess.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Enum Name="bead.Persistence.GameDirection" Collapsed="true">
-    <Position X="14.5" Y="4.75" Width="1.5" />
+  <Enum Name="bead.Persistence.GameDirection">
+    <Position X="15.5" Y="0.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAACACAAAAAAAI=</HashCode>
       <FileName>Persistence\GameGuard.cs</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="bead.Difficulty" Collapsed="true">
-    <Position X="12.75" Y="4.75" Width="1.5" />
+  <Enum Name="bead.Difficulty">
+    <Position X="12.75" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkAAA=</HashCode>
       <FileName>View\GameForm.cs</FileName>

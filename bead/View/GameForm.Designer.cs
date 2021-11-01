@@ -110,7 +110,7 @@
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "GameForm";
-            this.Text = "Form1";
+            this.Text = "MaciLaci";
             this.Load += new System.EventHandler(this.GameForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDown_click);
             this.ResumeLayout(false);
