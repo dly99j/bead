@@ -12,13 +12,13 @@ namespace bead.Persistence
 
     public class GameGuard : GameObject
     {
-        public GameGuard(int x, int y)
+        public GameGuard(int m, int n)
         {
-            if ((x + y) % 2 == 0)
+            if ((m + n) % 2 == 0)
                 Direction = GameDirection.Up;
             else
                 Direction = GameDirection.Right;
-            mPosition = new Tuple<int, int>(x, y);
+            mPosition = new Tuple<int, int>(m, n);
         }
 
         public GameDirection Direction { get; set; }

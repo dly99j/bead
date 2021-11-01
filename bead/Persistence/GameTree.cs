@@ -4,9 +4,9 @@ namespace bead.Persistence
 {
     public class GameTree : GameObject
     {
-        public GameTree(int x, int y)
+        public GameTree(int m, int n)
         {
-            mPosition = new Tuple<int, int>(x, y);
+            mPosition = new Tuple<int, int>(m, n);
         }
     }
 }

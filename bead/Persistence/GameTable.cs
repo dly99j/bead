@@ -7,13 +7,13 @@ namespace bead.Persistence
     {
         #region constructors
 
-        public GameTable(int x, int y)
+        public GameTable(int m, int n)
         {
-            if (x < 1 || y < 1) throw new ArgumentOutOfRangeException("invalid table size");
+            if (m < 1 || n < 1) throw new ArgumentOutOfRangeException("invalid table size");
 
-            this.X = x;
-            this.Y = y;
-            Table = new char[this.X, this.Y];
+            this.M = m;
+            this.N = n;
+            TableCharRepresentation = new char[this.M, this.N];
             NumOfGuards = 0;
             NumOfFood = 0;
             Guards = new List<GameGuard>();
@@ -22,7 +22,7 @@ namespace bead.Persistence
             Ended = false;
         }
 
-        public GameTable() : this(10, 10)
+        public GameTable() : this(5, 5)
         {
         }
 
@@ -30,55 +30,55 @@ namespace bead.Persistence
 
         #region methods
 
-        public void setFieldOnInit(int x, int y, char val)
+        public void setFieldOnInit(int m, int n, char val)
         {
-            if (x >= this.X || x < 0 || y >= this.Y || y < 0)
+            if (m >= this.M || m < 0 || n >= this.N || n < 0)
                 throw new ArgumentOutOfRangeException("invalid coordinates");
 
             if (val != 'P' && val != 'G' && val != 'T' && val != 'F' && val != 'E')
                 throw new ArgumentException("invalid field type");
 
-            Table[x, y] = val;
+            TableCharRepresentation[m, n] = val;
 
             if (val == 'G')
             {
                 ++NumOfGuards;
-                Guards.Add(new GameGuard(x, y));
+                Guards.Add(new GameGuard(m, n));
             }
             else if (val == 'F')
             {
                 ++NumOfFood;
-                Foods.Add(new GameFood(x, y));
+                Foods.Add(new GameFood(m, n));
             }
             else if (val == 'P')
             {
-                Player = new GamePlayer(x, y);
+                Player = new GamePlayer(m, n);
             }
             else if (val == 'T')
             {
-                Trees.Add(new GameTree(x, y));
+                Trees.Add(new GameTree(m, n));
             }
         }
 
-        public char GetField(int x, int y)
+        public char GetField(int m, int n)
         {
-            return Table[x, y];
+            return TableCharRepresentation[m, n];
         }
 
         #endregion
 
         #region properties
 
-        public Tuple<int, int> Size => new Tuple<int, int>(X, Y);
+        public Tuple<int, int> Size => new Tuple<int, int>(M, N);
 
         //E = empty field
         //F = Food
         //G = Guard
         //P = Player
         //T = Tree
-        public char[,] Table { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
+        public char[,] TableCharRepresentation { get; set; }
+        public int M { get; set; }
+        public int N { get; set; }
         public GamePlayer Player { get; set; }
         public List<GameFood> Foods { get; set; }
         public List<GameTree> Trees { get; set; }

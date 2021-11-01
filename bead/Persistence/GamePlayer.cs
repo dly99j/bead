@@ -4,10 +4,10 @@ namespace bead.Persistence
 {
     public class GamePlayer : GameObject
     {
-        public GamePlayer(int x, int y)
+        public GamePlayer(int m, int n)
         {
             IsCaught = false;
-            mPosition = new Tuple<int, int>(x, y);
+            mPosition = new Tuple<int, int>(m, n);
         }
 
         public bool IsCaught { get; }

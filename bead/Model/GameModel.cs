@@ -14,8 +14,6 @@ namespace bead.Model
         {
             mDataAccess = dataAccess;
             GameTable = new GameTable();
-            Time = 0;
-            FoodCount = 5;
         }
 
         #endregion
@@ -36,9 +34,9 @@ namespace bead.Model
 
         public bool IsGameOver => GameTable.Ended;
 
-        public int Width => GameTable.X;
-        public int Height => GameTable.Y;
-        public char[,] CharTableRepresentation => GameTable.Table;
+        public int Width => GameTable.N;
+        public int Height => GameTable.M;
+        public char[,] CharTableRepresentation => GameTable.TableCharRepresentation;
 
         #endregion
 
@@ -64,28 +62,28 @@ namespace bead.Model
 
         private bool CanMove(GameObject movable, GameDirection dir)
         {
-            var posX = movable.Position.Item1;
-            var posY = movable.Position.Item2;
+            var posM = movable.Position.Item1;
+            var posN = movable.Position.Item2;
             switch (dir)
             {
                 case GameDirection.Up:
-                    if (posY + 1 < GameTable.Y &&
-                        GameTable.Table[posX, posY + 1] != 'T')
-                        return true;
-                    break;
-                case GameDirection.Right:
-                    if (posX + 1 < GameTable.X &&
-                        GameTable.Table[posX + 1, posY] != 'T')
-                        return true;
-                    break;
-                case GameDirection.Down:
-                    if (posY - 1 >= 0 &&
-                        GameTable.Table[posX, posY - 1] != 'T')
+                    if (posM - 1 >= 0 &&
+                        GameTable.TableCharRepresentation[posM - 1, posN] != 'T')
                         return true;
                     break;
                 case GameDirection.Left:
-                    if (posX - 1 >= 0 &&
-                        GameTable.Table[posX - 1, posY] != 'T')
+                    if (posN - 1 >= 0 &&
+                        GameTable.TableCharRepresentation[posM, posN - 1] != 'T')
+                        return true;
+                    break;
+                case GameDirection.Down:
+                    if (posM + 1 < Height &&
+                        GameTable.TableCharRepresentation[posM + 1, posN] != 'T')
+                        return true;
+                    break;
+                case GameDirection.Right:
+                    if (posN + 1 < Width &&
+                        GameTable.TableCharRepresentation[posM, posN + 1] != 'T')
                         return true;
                     break;
             }
@@ -95,22 +93,22 @@ namespace bead.Model
 
         private void MoveMovable(GameObject movable, GameDirection dir)
         {
-            var posX = movable.Position.Item1;
-            var posY = movable.Position.Item2;
+            var posM = movable.Position.Item1;
+            var posN = movable.Position.Item2;
             if (CanMove(movable, dir))
                 switch (dir)
                 {
                     case GameDirection.Up:
-                        movable.Position = new Tuple<int, int>(posX, posY + 1);
-                        break;
-                    case GameDirection.Right:
-                        movable.Position = new Tuple<int, int>(posX + 1, posY);
-                        break;
-                    case GameDirection.Down:
-                        movable.Position = new Tuple<int, int>(posX, posY - 1);
+                        movable.Position = new Tuple<int, int>(posM - 1, posN);
                         break;
                     case GameDirection.Left:
-                        movable.Position = new Tuple<int, int>(posX - 1, posY);
+                        movable.Position = new Tuple<int, int>(posM, posN - 1);
+                        break;
+                    case GameDirection.Down:
+                        movable.Position = new Tuple<int, int>(posM + 1, posN);
+                        break;
+                    case GameDirection.Right:
+                        movable.Position = new Tuple<int, int>(posM, posN + 1);
                         break;
                 }
         }
@@ -125,15 +123,15 @@ namespace bead.Model
 
         private bool IsVisibleForGuards()
         {
-            var playerX = GameTable.Player.Position.Item1;
-            var playerY = GameTable.Player.Position.Item2;
+            var playerM = GameTable.Player.Position.Item1;
+            var playerN = GameTable.Player.Position.Item2;
             foreach (var v in GameTable.Guards)
             {
-                var guardX = v.Position.Item1;
-                var guardY = v.Position.Item2;
+                var guardM = v.Position.Item1;
+                var guardN = v.Position.Item2;
 
-                if (Enumerable.Range(playerX - 1, playerX + 1).Contains(guardX) ||
-                    Enumerable.Range(playerY - 1, playerY + 1).Contains(guardY))
+                if ((guardM - 1 <= playerM && playerM <= guardM + 1) &&
+                    (guardN - 1 <= playerN && playerN <= guardN + 1))
                     return true;
             }
 
@@ -157,17 +155,18 @@ namespace bead.Model
                 if (v.Position.Equals(GameTable.Player.Position))
                 {
                     GameTable.Foods.Remove(v);
-                    --GameTable.NumOfFood;
+                    --FoodCount;
+                    break;
                 }
         }
 
         public void UpdateTable()
         {
-            var newTable = new char[GameTable.X, GameTable.Y];
+            var newTable = new char[Height, Width];
 
-            for (var i = 0; i < GameTable.Y; ++i)
-                for (var j = 0; j < GameTable.X; ++j)
-                    newTable[j, i] = 'E';
+            for (var i = 0; i < Height; ++i)
+                for (var j = 0; j < Width; ++j)
+                    newTable[i, j] = 'E';
 
             foreach (var v in GameTable.Foods)
                 newTable[v.Position.Item1, v.Position.Item2] = 'F';
@@ -180,7 +179,7 @@ namespace bead.Model
 
             newTable[GameTable.Player.Position.Item1, GameTable.Player.Position.Item2] = 'P';
 
-            GameTable.Table = newTable;
+            GameTable.TableCharRepresentation = newTable;
         }
 
         public async Task LoadGameAsync(string path)
@@ -193,6 +192,14 @@ namespace bead.Model
             FoodCount = GameTable.NumOfFood;
         }
 
+        public void GameOver()
+        {
+            if (FoodCount == 0)
+                Over?.Invoke(this, new GameEventArgs(Time, true, FoodCount, GameTable));
+            else
+                Over?.Invoke(this, new GameEventArgs(Time, false, FoodCount, GameTable));
+        }
+
         public async void GameStep()
         {
             if (IsGameOver)
@@ -201,8 +208,11 @@ namespace bead.Model
             await MoveGuards();
             UpdateTable();
 
-            //if (IsVisibleForGuards())
-            //    GameTable.Ended = true;
+            if (IsVisibleForGuards() || FoodCount == 0)
+            {
+                GameTable.Ended = true;
+                GameOver();
+            }
         }
 
         public async void PlayerStep(GameDirection dir)
@@ -212,9 +222,13 @@ namespace bead.Model
 
             await MovePlayer(dir);
             UpdateTable();
+            PlayerMove?.Invoke(this, new GameEventArgs(Time, IsGameOver, FoodCount, GameTable));
 
-            //if (IsVisibleForGuards())
-            //    GameTable.Ended = true;
+            if (IsVisibleForGuards() || FoodCount == 0)
+            {
+                GameTable.Ended = true;
+                GameOver();
+            }
         }
         public void AdvanceTime()
         {
@@ -222,8 +236,17 @@ namespace bead.Model
                 return;
 
             ++Time;
-            OnGameAdvanced();
+            Advanced?.Invoke(this, new GameEventArgs(Time, false, FoodCount, GameTable));
+
             GameStep();
+        }
+
+        public void RefreshTable()
+        {
+            if (IsGameOver)
+                return;
+
+            Refresh?.Invoke(this, new GameEventArgs(Time, false, FoodCount, GameTable));
         }
 
         #endregion
@@ -234,29 +257,9 @@ namespace bead.Model
 
         public event EventHandler<GameEventArgs> Over;
 
-        public event EventHandler<GameEventArgs> PlayerMove; 
+        public event EventHandler<GameEventArgs> PlayerMove;
 
-        #endregion
-
-        #region private event methods
-
-        private void OnGameAdvanced()
-        {
-            if (Advanced != null)
-                Advanced(this, new GameEventArgs(Time, false, FoodCount));
-        }
-
-        private void OnPlayerMove()
-        {
-            if (PlayerMove != null)
-                PlayerMove(this, new GameEventArgs(Time, IsGameOver, FoodCount));
-        }
-
-        private void OnGameOver(Boolean isWon)
-        {
-            if (Over != null)
-                Over(this, new GameEventArgs(Time, isWon, FoodCount));
-        }
+        public event EventHandler<GameEventArgs> Refresh;
 
         #endregion
     }

@@ -1,23 +1,24 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
-using bead.Model;
+﻿using bead.Model;
 using bead.Persistence;
 using bead.View;
+using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace bead
 {
-    public enum Difficulty {Easy, Medium, Hard}
+    public enum Difficulty { Easy, Medium, Hard }
     public partial class GameForm : Form
     {
         private GameDataAccess mDataAccess;
         private GameModel mGameModel;
-        private int mObjectWidth, mObjectHeight;
         private DifficultyForm mDifficultyForm;
         private Button[,] mButtonGrid;
-        private Boolean mGameStarted = false, mMapLoaded = false;
+        private Boolean mGameStarted = false, mNeedsReload = false, mReAddTick = false;
         private Difficulty mDifficulty;
+        private Stopwatch mStopWatch;
+        private int mTotalFood;
 
         public GameForm()
         {
@@ -30,42 +31,35 @@ namespace bead
             mDifficultyForm = new DifficultyForm();
             mGameModel = new GameModel(mDataAccess);
 
-            mGameModel.Advanced += Game_GameAdvanced;
-            mGameModel.Over += Game_GameOver;
+            mGameModel.Advanced += new EventHandler<GameEventArgs>(advanceTime);
+            mGameModel.Over += new EventHandler<GameEventArgs>(gameOver);
+            mGameModel.PlayerMove += new EventHandler<GameEventArgs>(playerStep);
+            mGameModel.Refresh += new EventHandler<GameEventArgs>(refreshTable);
 
-            mTimer = new Timer();
-            mTimer.Interval = 1000;
-            mTimer.Tick += Timer_Tick;
+            GameAdvanceTimer = new Timer();
+            GameAdvanceTimer.Interval = 1000;
+            mStopWatch = new Stopwatch();
+            UpdateTimer = new Timer();
+            UpdateTimer.Interval = 1;
+
+            GameAdvanceTimer.Tick += new EventHandler(AdvanceTimer_Tick);
+            UpdateTimer.Tick += new EventHandler(UpdateTimer_Tick);
+
         }
 
-        private void Game_GameAdvanced(object sender, EventArgs e)
+        private void GenerateTable(Object sender, GameEventArgs e)
         {
-            UpdateFillTable();
-        }
+            mButtonGrid = new Button[e.Table.M, e.Table.N];
 
-        private void Game_GameOver(object sender, GameEventArgs e)
-        {
-            mTimer.Stop();
-
-            if (e.IsWon)
-                MessageBox.Show("Congrats. You won", "MaciLaci", MessageBoxButtons.OK);
-            else
-                MessageBox.Show("You suck.", "MaciLaci", MessageBoxButtons.OK);
-        }
-
-        private void GenerateTable()
-        {
-            mButtonGrid = new Button[mGameModel.Width, mGameModel.Height];
-
-            for (Int32 i = 0; i < mGameModel.GameTable.X; i++)
+            for (Int32 i = 0; i < e.Table.M; ++i)
             {
-                for (Int32 j = 0; j < mGameModel.GameTable.Y; j++)
+                for (Int32 j = 0; j < e.Table.N; ++j)
                 {
                     mButtonGrid[i, j] = new Button();
                     mButtonGrid[i, j].Location = new Point(5 + 50 * j, 35 + 50 * i);
                     mButtonGrid[i, j].Size = new Size(50, 50);
-                    mButtonGrid[i, j].Enabled = false; // kikapcsolt állapot
-                    mButtonGrid[i, j].TabIndex = 100 + i * mGameModel.GameTable.X + j;
+                    mButtonGrid[i, j].Enabled = false;
+                    mButtonGrid[i, j].TabIndex = 100 + i * e.Table.M + j;
                     mButtonGrid[i, j].FlatStyle = FlatStyle.Flat;
 
                     Controls.Add(mButtonGrid[i, j]);
@@ -73,13 +67,13 @@ namespace bead
             }
         }
 
-        private void UpdateFillTable()
+        private void UpdateFillTable(Object sender, GameEventArgs e)
         {
-            for (Int32 i = 0; i < mGameModel.Width; i++)
+            for (Int32 i = 0; i < e.Table.M; ++i)
             {
-                for (Int32 j = 0; j < mGameModel.Height; j++)
+                for (Int32 j = 0; j < e.Table.N; ++j)
                 {
-                    switch (mGameModel.CharTableRepresentation[i, j])
+                    switch (e.Table.TableCharRepresentation[i, j])
                     {
                         case 'E':
                             mButtonGrid[i, j].BackColor = Color.LightGray;
@@ -101,14 +95,16 @@ namespace bead
             }
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void AdvanceTimer_Tick(object sender, EventArgs e)
         {
             mGameModel.AdvanceTime();
-            UpdateFillTable();
+            TimeLabel.Text = "Time: " + mStopWatch.ElapsedMilliseconds / 1000 + " sec";
+            FoodEaten.Text = "Food eaten: " + (mTotalFood - mGameModel.FoodCount);
         }
 
-        private void MenuFileLoadGame_Click(object sender, EventArgs e)
+        private void UpdateTimer_Tick(object sender, EventArgs e)
         {
+            mGameModel.RefreshTable();
         }
 
         private void OnNewGame_click(object sender, EventArgs e)
@@ -118,38 +114,32 @@ namespace bead
 
         private void OnPause_click(object sender, EventArgs e)
         {
-        }
-
-        private void SetupNewGame()
-        {
-            mDifficulty = mDifficultyForm.GameDifficulty;
-            mGameStarted = true;
-            LoadMapFromFile();
-            GenerateTable();
-            UpdateFillTable();
-            mTimer.Start();
+            if (GameAdvanceTimer.Enabled) { GameAdvanceTimer.Stop(); mStopWatch.Stop(); Pause.Text = "Continue"; }
+            else { GameAdvanceTimer.Start(); mStopWatch.Start(); Pause.Text = "Pause"; }
         }
 
         private void Start_Click(object sender, EventArgs e)
         {
-            SetupNewGame();
+            SetupNewGame(sender, e);
         }
 
         private void KeyDown_click(object sender, KeyEventArgs e)
         {
+            if (!GameAdvanceTimer.Enabled) return;
+
             switch (e.KeyCode)
             {
                 case Keys.W:
-                    mGameModel.PlayerStep(GameDirection.Left);
+                    mGameModel.PlayerStep(GameDirection.Up);
                     break;
                 case Keys.A:
-                    mGameModel.PlayerStep(GameDirection.Down);
+                    mGameModel.PlayerStep(GameDirection.Left);
                     break;
                 case Keys.S:
-                    mGameModel.PlayerStep(GameDirection.Right);
+                    mGameModel.PlayerStep(GameDirection.Down);
                     break;
                 case Keys.D:
-                    mGameModel.PlayerStep(GameDirection.Up);
+                    mGameModel.PlayerStep(GameDirection.Right);
                     break;
             }
         }
@@ -162,20 +152,107 @@ namespace bead
                 {
                     case Difficulty.Easy:
                         await mGameModel.LoadGameAsync(@"C:\Users\dr. Jenei Tímea\source\repos\bead\bead\table1.txt");
+                        this.ClientSize = new System.Drawing.Size(800, 600);
                         break;
                     case Difficulty.Medium:
                         await mGameModel.LoadGameAsync(@"C:\Users\dr. Jenei Tímea\source\repos\bead\bead\table2.txt");
+                        this.ClientSize = new System.Drawing.Size(1000, 800);
                         break;
                     case Difficulty.Hard:
                         await mGameModel.LoadGameAsync(@"C:\Users\dr. Jenei Tímea\source\repos\bead\bead\table3.txt");
+                        this.ClientSize = new System.Drawing.Size(1150, 1000);
                         break;
                 }
+                mTotalFood = mGameModel.FoodCount;
             }
             catch (Exception e)
             {
                 MessageBox.Show("error while loading map\n" + e.ToString());
             }
-            mTimer.Start();
+        }
+
+        private void Reset(Object sender, EventArgs e)
+        {
+            foreach (var v in mButtonGrid)
+                Controls.Remove(v);
+
+            mDataAccess = new GameDataAccess();
+            mGameModel = new GameModel(mDataAccess);
+
+            mGameModel.Advanced += new EventHandler<GameEventArgs>(advanceTime);
+            mGameModel.Over += new EventHandler<GameEventArgs>(gameOver);
+            mGameModel.PlayerMove += new EventHandler<GameEventArgs>(playerStep);
+            mGameModel.Refresh += new EventHandler<GameEventArgs>(refreshTable);
+
+            GameAdvanceTimer = new Timer();
+            GameAdvanceTimer.Interval = 1000;
+            UpdateTimer = new Timer();
+            UpdateTimer.Interval = 1;
+            mStopWatch = new Stopwatch();
+
+            if (mReAddTick)
+            {
+                GameAdvanceTimer.Tick += new EventHandler(AdvanceTimer_Tick);
+                UpdateTimer.Tick += new EventHandler(UpdateTimer_Tick);
+                mReAddTick = false;
+            }
+
+            mNeedsReload = true;
+        }
+
+        private void SetupNewGame(Object sender, EventArgs e)
+        {
+            if (mGameStarted) Reset(sender, e);
+
+            mDifficulty = mDifficultyForm.GameDifficulty;
+            
+            mGameStarted = true;
+            LoadMapFromFile();
+            GameAdvanceTimer.Start();
+            mStopWatch.Start();
+            Pause.Text = "Pause";
+        }
+
+        private void advanceTime(Object sender, GameEventArgs e)
+        {
+            if (mButtonGrid == null || mNeedsReload)
+            {
+                GenerateTable(sender, e);
+                mNeedsReload = false;
+            }
+            if (!UpdateTimer.Enabled) UpdateTimer.Start();
+            UpdateFillTable(sender, e);
+        }
+        private void refreshTable(Object sender, GameEventArgs e)
+        {
+            if (mButtonGrid == null || mNeedsReload)
+            {
+                GenerateTable(sender, e);
+                mNeedsReload = false;
+            }
+            UpdateFillTable(sender, e);
+        }
+        private void playerStep(Object sender, GameEventArgs e)
+        {
+            if (mButtonGrid == null || mNeedsReload)
+            {
+                GenerateTable(sender, e);
+                mNeedsReload = false;
+            }
+            UpdateFillTable(sender, e);
+        }
+        private void gameOver(Object sender, GameEventArgs e)
+        {
+            GameAdvanceTimer.Stop();
+            UpdateTimer.Stop();
+            mStopWatch.Stop();
+
+            if (e.IsWon)
+                MessageBox.Show("Congrats. You won", "MaciLaci", MessageBoxButtons.OK);
+            else
+                MessageBox.Show("You suck.", "MaciLaci", MessageBoxButtons.OK);
+
+            mReAddTick = true;
         }
     }
 }

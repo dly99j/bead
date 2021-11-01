@@ -8,6 +8,7 @@ namespace bead.View
         public DifficultyForm()
         {
             InitializeComponent();
+            GameDifficulty = Difficulty.Easy;
         }
 
         public Difficulty GameDifficulty { get; private set; }

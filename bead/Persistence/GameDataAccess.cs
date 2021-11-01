@@ -15,40 +15,18 @@ namespace bead.Persistence
                 {
                     var line = await reader.ReadLineAsync();
                     var size = line.Split(' ');
-                    var tableX = int.Parse(size[0]);
-                    var tableY = int.Parse(size[1]);
-                    var table = new GameTable(tableX, tableY);
+                    var tableM = int.Parse(size[0]);
+                    var tableN = int.Parse(size[1]);
+                    var table = new GameTable(tableM, tableN);
 
-                    for (var i = 0; i < tableY; ++i)
+                    for (var i = 0; i < tableM; ++i)
                     {
                         line = await reader.ReadLineAsync();
-                        for (var j = 0; j < tableX; ++j) 
+                        for (var j = 0; j < tableN; ++j) 
                             table.setFieldOnInit(i, j, line[j]);
                     }
 
                     return table;
-                }
-            }
-            catch
-            {
-                throw new GameDataException();
-            }
-        }
-
-        public async Task SaveAsync(string path, GameTable table)
-        {
-            try
-            {
-                await using (var writer = new StreamWriter(path))
-                {
-                    var size = table.Size;
-                    await writer.WriteLineAsync(size.ToString());
-
-                    for (var i = 0; i < size.Item1; ++i)
-                    {
-                        for (var j = 0; j < size.Item2; ++j) await writer.WriteAsync(table.GetField(i, j));
-                        await writer.WriteLineAsync();
-                    }
                 }
             }
             catch
