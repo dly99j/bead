@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using System.IO;
 
 namespace bead
 {
@@ -97,6 +98,7 @@ namespace bead
 
         private void AdvanceTimer_Tick(object sender, EventArgs e)
         {
+            if (!GameAdvanceTimer.Enabled) return;
             mGameModel.AdvanceTime();
             TimeLabel.Text = "Time: " + mStopWatch.ElapsedMilliseconds / 1000 + " sec";
             FoodEaten.Text = "Food eaten: " + (mTotalFood - mGameModel.FoodCount);
@@ -114,8 +116,9 @@ namespace bead
 
         private void OnPause_click(object sender, EventArgs e)
         {
-            if (GameAdvanceTimer.Enabled) { GameAdvanceTimer.Stop(); mStopWatch.Stop(); Pause.Text = "Continue"; }
-            else { GameAdvanceTimer.Start(); mStopWatch.Start(); Pause.Text = "Pause"; }
+            if (mButtonGrid == null) return;
+            if (GameAdvanceTimer.Enabled) { GameAdvanceTimer.Stop(); UpdateTimer.Stop(); mStopWatch.Stop(); Pause.Text = "Continue"; }
+            else { GameAdvanceTimer.Start(); UpdateTimer.Start(); mStopWatch.Start(); Pause.Text = "Pause"; }
         }
 
         private void Start_Click(object sender, EventArgs e)
@@ -151,15 +154,15 @@ namespace bead
                 switch (mDifficulty)
                 {
                     case Difficulty.Easy:
-                        await mGameModel.LoadGameAsync(@"C:\Users\dr. Jenei Tímea\source\repos\bead\bead\table1.txt");
+                        await mGameModel.LoadGameAsync(@"..\..\..\table1.txt");
                         this.ClientSize = new System.Drawing.Size(800, 600);
                         break;
                     case Difficulty.Medium:
-                        await mGameModel.LoadGameAsync(@"C:\Users\dr. Jenei Tímea\source\repos\bead\bead\table2.txt");
+                        await mGameModel.LoadGameAsync(@"..\..\..\table2.txt");
                         this.ClientSize = new System.Drawing.Size(1000, 800);
                         break;
                     case Difficulty.Hard:
-                        await mGameModel.LoadGameAsync(@"C:\Users\dr. Jenei Tímea\source\repos\bead\bead\table3.txt");
+                        await mGameModel.LoadGameAsync(@"..\..\..\table3.txt");
                         this.ClientSize = new System.Drawing.Size(1150, 1000);
                         break;
                 }
